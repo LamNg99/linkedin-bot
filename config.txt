@@ -1,2 +1,2 @@
-username = tunglam030699@gmail.com
-password = tunglam030699
+username = Your LinkedIn username
+password = Your LinkedIn password
