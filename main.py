@@ -9,12 +9,12 @@ import random
 driver = webdriver.Chrome('/Users/lamnguyen/Desktop/Projects/linkedin-bot/chromedriver')
 
 
-def login_bot():
+def login_bot(driver):
     '''
     This bot is used to login into your Linkedin profile
     '''
     driver.get('https://www.linkedin.com')
-    time.sleep(random.uniform(0.5, 1))
+    time.sleep(1)
     # Get username and password in the config.txt file
     try:
         with open('config.txt', mode='r') as config_file:
@@ -30,17 +30,17 @@ def login_bot():
 
     fill_usr.send_keys(username)
     fill_pass.send_keys(password)
-    time.sleep(random.uniform(0.5, 1))
+    time.sleep(1)
 
     login_button = driver.find_element(By.XPATH, "//button[@type='submit']").click()
-    print('Login Successfully!')
+    print('Successfully Logged In!')
 
-login_bot()
+login_bot(driver)
 
-def connect_bot():
+def connect_bot(driver):
     page = random.randint(1,100)
     driver.get(f'https://www.linkedin.com/search/results/people/?network=%5B%22S%22%5D&origin=FACETED_SEARCH&page={page}')
-    time.sleep(random.uniform(0.5, 1))
+    time.sleep(2)
 
     all_buttons = driver.find_elements(By.TAG_NAME, 'button')
     connect_buttons = [btn for btn in all_buttons if btn.text == 'Connect']
@@ -48,22 +48,22 @@ def connect_bot():
 
     for btn in connect_buttons:
         driver.execute_script('arguments[0].click()', btn)
-        time.sleep(random.uniform(0.5, 1))
+        time.sleep(1)
 
         send_button = driver.find_element(By.XPATH, "//button[@aria-label='Send now']")
         driver.execute_script('arguments[0].click()', send_button)
         close_button = driver.find_element(By.XPATH, "//button[@aria-label='Dismiss']")
         driver.execute_script('arguments[0].click()', close_button)
-        time.sleep(random.uniform(0.5, 1))
+        time.sleep(1)
         count += 1
     
     print(f'You have sent {count} connect invitation(s)')
 
-# connect_bot()
+# connect_bot(driver)
 
-def accept_bot ():
+def accept_bot (driver):
     driver.get('https://www.linkedin.com/mynetwork/invitation-manager/?invitationType=ALL')
-    time.sleep(random.uniform(0.5, 1))
+    time.sleep(2)
 
     all_buttons = driver.find_elements(By.TAG_NAME, 'button')
     accept_buttons = [btn for btn in all_buttons if btn.text == 'Accept']
@@ -73,7 +73,7 @@ def accept_bot ():
         count = 0 
         for btn in accept_buttons:
             driver.execute_script('arguments[0].click', btn)
-            time.sleep(random.uniform(0.5, 1))
+            time.sleep(1)
             count += 1
         print(f'You have accepted {count} connect invitation(s)')
     else:
@@ -81,7 +81,7 @@ def accept_bot ():
 
 
 
-accept_bot()
+accept_bot(driver)
 
 
 
