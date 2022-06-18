@@ -5,14 +5,27 @@ import sys
 import time
 import random
 
-# Open the Chrome driver and go to Linkedin login page
-driver = webdriver.Chrome('/Users/lamnguyen/Desktop/Projects/linkedin-bot/chromedriver')
-
-
-def login_bot(driver):
+def performance(func):
     '''
-    This bot is used to login into your Linkedin profile
+    This function measures our bots' performance 
     '''
+    def wrapper(*args, **kwargs):
+        print('\n****************************************************************')
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        finish_time = time.time()
+        print(f'Running time: {finish_time - start_time} (s)')
+        print('****************************************************************\n')
+        return result
+    return wrapper
+
+@performance
+def login_bot(driver, bot_name='login_bot'):
+    '''
+    This bot is used to login into your Linkedin profile using 
+    username and password from config.txt file
+    '''
+    print(f'{bot_name} is running ...')
     driver.get('https://www.linkedin.com')
     time.sleep(1)
     # Get username and password in the config.txt file
@@ -35,9 +48,13 @@ def login_bot(driver):
     login_button = driver.find_element(By.XPATH, "//button[@type='submit']").click()
     print('Successfully Logged In!')
 
-login_bot(driver)
+@performance
+def connect_bot(driver, bot_name='connect_bot'):
+    '''
+    This bot will send connect invitations to people with 2nd connections randomly between page 1 and 100. 
+    '''
+    print(f'{bot_name} is running ...')
 
-def connect_bot(driver):
     page = random.randint(1,100)
     driver.get(f'https://www.linkedin.com/search/results/people/?network=%5B%22S%22%5D&origin=FACETED_SEARCH&page={page}')
     time.sleep(2)
@@ -59,9 +76,13 @@ def connect_bot(driver):
     
     print(f'You have sent {count} connect invitation(s)')
 
-# connect_bot(driver)
+@performance
+def accept_bot (driver, bot_name='accept_bot'):
+    '''
+    This bot will accept any new connect invitations from people on LinkedIn
+    '''
+    print(f'{bot_name} is running ...')
 
-def accept_bot (driver):
     driver.get('https://www.linkedin.com/mynetwork/invitation-manager/?invitationType=ALL')
     time.sleep(2)
 
@@ -69,19 +90,33 @@ def accept_bot (driver):
     accept_buttons = [btn for btn in all_buttons if btn.text == 'Accept']
     
     if accept_buttons:
-        print(accept_buttons)
         count = 0 
         for btn in accept_buttons:
-            driver.execute_script('arguments[0].click', btn)
-            time.sleep(1)
+            driver.execute_script('arguments[0].click;', btn)
+            time.sleep(2)
             count += 1
         print(f'You have accepted {count} connect invitation(s)')
     else:
         print('You don\'t have any new connect invitation!')
 
 
+def run_bot(driver):
+    login_bot(driver)
+    for bot in sys.argv[1:]:
+        if bot == 'connect_bot':
+            connect_bot(driver)
+        elif bot == 'accept_bot':
+            accept_bot(driver)
+        else:
+            print(f'Invalid Command: {bot}')
 
-accept_bot(driver)
+    print('All bot(s) completed their tasks!')
+
+if __name__ == "__main__":
+    driver = webdriver.Chrome('/Users/lamnguyen/Desktop/Projects/linkedin-bot/chromedriver')
+    run_bot(driver)
+    driver.close()
+
 
 
 
